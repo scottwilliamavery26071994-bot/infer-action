@@ -1,4 +1,5 @@
 name: Infer Agent
+
 on:
   issues:
     types:
@@ -12,10 +13,22 @@ on:
       - created
 
 jobs:
+  # 代码格式检查任务
+  format:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+      - run: bun install
+      - run: bun run format:check   # 若格式不符，该步骤将失败
+
+  # 原有的推理任务
   run-agent:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v7.0.0
+      - uses: actions/checkout@v4
       - uses: inference-gateway/infer-action@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
