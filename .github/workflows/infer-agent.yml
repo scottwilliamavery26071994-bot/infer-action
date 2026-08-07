@@ -13,7 +13,7 @@ on:
       - created
 
 jobs:
-  # 代码格式检查任务
+  # 自动格式化代码并提交
   format:
     runs-on: ubuntu-24.04
     steps:
@@ -22,9 +22,26 @@ jobs:
         with:
           bun-version: latest
       - run: bun install
-      - run: bun run format:check   # 若格式不符，该步骤将失败
+      - run: bun run format:write   # 修复所有格式问题
 
-  # 原有的推理任务
+      - name: 检查是否有文件被修改
+        id: check_changes
+        run: |
+          if [[ -n $(git status --porcelain) ]]; then
+            echo "changes=true" >> $GITHUB_ENV
+          else
+            echo "changes=false" >> $GITHUB_ENV
+          fi
+
+      - name: 提交格式修复
+        if: env.changes == 'true'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: apply Prettier formatting [skip ci]"
+          commit_user_name: "github-actions[bot]"
+          commit_user_email: "github-actions[bot]@users.noreply.github.com"
+
+  # 原有的推理任务（与 format 并行执行）
   run-agent:
     runs-on: ubuntu-24.04
     steps:
