@@ -23,18 +23,17 @@ jobs:
 
       - run: bun install
 
-      # 注意：这里运行的是 format:write，不是 format:check
-      # format:write 会修复问题，不会因为格式错误而退出
+      # 关键：这里使用 format:write（自动修复），而非 format:check（会失败）
       - run: bun run format:write
 
-      # 如果有修改，自动提交（[skip ci] 避免循环触发）
+      # 自动提交修复后的文件（包含 [skip ci] 避免循环触发）
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore: apply Prettier formatting [skip ci]"
           commit_user_name: "github-actions[bot]"
           commit_user_email: "github-actions[bot]@users.noreply.github.com"
 
-      # 您的推理任务（在格式修复之后执行）
+      # 您的推理任务
       - uses: inference-gateway/infer-action@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
