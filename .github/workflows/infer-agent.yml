@@ -21,20 +21,20 @@ jobs:
         with:
           bun-version: latest
 
-      # 安装依赖（使 prettier 可用）
       - run: bun install
 
-      # 自动修复所有格式问题（不会产生错误退出码）
+      # 注意：这里运行的是 format:write，不是 format:check
+      # format:write 会修复问题，不会因为格式错误而退出
       - run: bun run format:write
 
-      # 如果有文件被修改，自动提交（包含 [skip ci] 避免循环）
+      # 如果有修改，自动提交（[skip ci] 避免循环触发）
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore: apply Prettier formatting [skip ci]"
           commit_user_name: "github-actions[bot]"
           commit_user_email: "github-actions[bot]@users.noreply.github.com"
 
-      # 您的推理任务（在修复之后执行，确保代码格式正确）
+      # 您的推理任务（在格式修复之后执行）
       - uses: inference-gateway/infer-action@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
