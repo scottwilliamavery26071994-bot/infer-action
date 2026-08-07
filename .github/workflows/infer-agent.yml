@@ -20,19 +20,21 @@ jobs:
       - uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
-      - run: bun install   # 安装依赖，使 prettier 可用
 
-      # 自动修复所有格式问题（不会报错）
+      # 安装依赖（使 prettier 可用）
+      - run: bun install
+
+      # 自动修复所有格式问题（不会产生错误退出码）
       - run: bun run format:write
 
-      # 如果有文件被修改，自动提交
+      # 如果有文件被修改，自动提交（包含 [skip ci] 避免循环）
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore: apply Prettier formatting [skip ci]"
           commit_user_name: "github-actions[bot]"
           commit_user_email: "github-actions[bot]@users.noreply.github.com"
 
-      # 原有的推理任务
+      # 您的推理任务（在修复之后执行，确保代码格式正确）
       - uses: inference-gateway/infer-action@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
